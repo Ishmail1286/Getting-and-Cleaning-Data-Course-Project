@@ -1,6 +1,4 @@
 # Getting-and-Cleaning-Data-Course-Project
-ReadMe
-# Getting-Cleaning-Data-Project
 Coursera Data Science Specialization Course 
 Course Project
 
