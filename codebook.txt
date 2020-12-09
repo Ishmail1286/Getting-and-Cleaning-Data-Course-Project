@@ -1,0 +1,49 @@
+Code Book for Coursera Data Science Specialization Course  	
+Getting and Cleanng Data  
+
+This codebook is intended to give a brief description of the variables used in this assignment.
+### Step 1: Merge training and test sets to create one data set
+	TESTING VARIABLES
+test.data <- read.table(file.path(targetFolder, 'test', 'X_test.txt'))
+test.activities <- read.table(file.path(targetFolder, 'test', 'y_test.txt'))
+test.subjects <- read.table(file.path(targetFolder, 'test', 'subject_test.txt'))
+TRAINING VARIABLES
+train.data <- read.table(file.path(targetFolder, 'train', 'X_train.txt'))
+train.activities <- read.table(file.path(targetFolder, 'train', 'y_train.txt'))
+train.subjects <- read.table(file.path(targetFolder, 'train', 'subject_train.txt'))
+BINDING VARIABLES
+data.data <- rbind(train.data, test.data)
+data.activities <- rbind(train.activities, test.activities)
+data.subjects <- rbind(train.subjects, test.subjects)
+MERGING VARIABLES
+full_data <- cbind(data.subjects, data.activities, data.data)
+### Step 2: Extract only measurements on mean and standard deviation
+GETTING FEATURES
+features <- read.table(file.path(targetFolder, 'features.txt'))
+FILTER FEATURES
+requiredFeatures <- features[grep('-(mean|std)\\(\\)', features[, 2 ]), 2]
+full_data <- full_data[, c(1, 2, requiredFeatures)]
+
+### Step 3: Use descriptive activities names for activity measurements
+activities <- read.table(file.path(targetFolder, 'activity_labels.txt'))
+	GETTING CONVERSION OF ACTIVITIES LABELS
+full_data[, 2] <- activities[full_data[,2], 2]
+
+### Step 4: Appropriately Label the Dataset with Descriptive Variable Names
+LABELING DATASET
+colnames(full_data) <- c(
+  'subject',
+  'activity',
+  gsub('\\-|\\(|\\)', '', as.character(requiredFeatures))
+)
+COERCING DATA INTO STRINGS
+full_data[, 2] <- as.character(full_data[, 2])
+
+### Step 5: Create tidy data set with average of each variable, by activity, by subject
+CREATING UNIQUE ROW FOR EAH COMBINATION
+final.melted <- melt(full_data, id = c('subject', 'activity'))
+GETTING THE MEAN VALUE
+final.mean <- dcast(final.melted, subject + activity ~ variable, mean)
+WRITING FINAL TABLE
+write.table(final.mean, file=file.path("tidy.txt"), row.names = FALSE, quote = FALSE)
+
